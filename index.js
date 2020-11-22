@@ -5,6 +5,8 @@ const io = require("socket.io")(http);
 
 app.use(express.static("public"));
 
+const port = process.env.PORT || 3000;
+
 let positions = [];
 
 function init() {
@@ -52,16 +54,11 @@ function checkWinner(x, y) {
   if (tbrO && tbrO.length === 3) winner = "O";
 
   let tbl = new Array(3);
-  switch ([x, y].join("")) {
-    case "02":
-      updateTbl(positions);
-      break;
-    case "11":
-      updateTbl(positions);
-      break;
-    case "20":
-      updateTbl(positions);
-      break;
+
+  let wtf = [x, y].join("");
+
+  if (wtf === "02" || wtf === "11" || wtf === "20") {
+    updateTbl(positions);
   }
 
   function updateTbl(positions) {
@@ -83,12 +80,12 @@ function isDraw() {
   return positions.flat().length === 9;
 }
 
-io.on("connection", function(socket) {
+io.on("connection", function (socket) {
   const symbol = {
     O: "X",
-    X: "O"
+    X: "O",
   };
-  socket.on("symbol", data => {
+  socket.on("symbol", (data) => {
     socket.broadcast.emit("symbol", symbol[data]);
     init();
     io.emit("turn", { turn: data });
@@ -102,14 +99,12 @@ io.on("connection", function(socket) {
         const winner = checkWinner(x, y);
         io.emit("message", winner);
       }
-      if(isDraw() && ! checkWinner(x, y)) io.emit("draw", true);
+      if (isDraw() && !checkWinner(x, y)) io.emit("draw", true);
     }
   });
-  socket.on("replay", data => {
+  socket.on("replay", (data) => {
     io.emit("replay", data);
   });
 });
 
-http.listen(1802, function() {
-  console.log("listening on *:1802");
-});
+http.listen(port, () => console.log(`Listening on http://localhost:${port}`));
