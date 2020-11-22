@@ -29,7 +29,7 @@ class Board {
         turn: value === "X" ? "O" : "X",
         x,
         y,
-        value
+        value,
       });
     }
   }
@@ -55,7 +55,7 @@ function reset() {
   socket.emit("replay", true);
 }
 
-socket.on("symbol", symbol => {
+socket.on("symbol", (symbol) => {
   sessionStorage.setItem("symbol", symbol);
   // Remove start screen
   document.querySelector(".start-screen").remove();
@@ -63,8 +63,8 @@ socket.on("symbol", symbol => {
 
 const cols = document.querySelectorAll(".col[data-id]");
 
-cols.forEach(col => {
-  col.addEventListener("click", function() {
+cols.forEach((col) => {
+  col.addEventListener("click", function () {
     const index = this.dataset.id;
     const [x, y] = index;
     const turn = sessionStorage.getItem("turn");
@@ -77,7 +77,7 @@ socket.on("drawPosition", ({ x, y, value }) => b.drawPosition(x, y, value));
 
 socket.on("replay", () => window.location.reload());
 
-socket.on("message", winner => {
+socket.on("message", (winner) => {
   const symbol = sessionStorage.getItem("symbol");
   document.getElementById("message").innerHTML =
     winner === symbol ? "¡HAS GANADO!" : `¡HA GANADO ${winner}!`;
